@@ -146,6 +146,7 @@ func main() {
 		credsFuncs = append(credsFuncs, kubeconfig.NewKubeconfigKeychain(ctx, opts...))
 	}
 	if config.Config.CRIKeychainConfig.EnableKeychain {
+		log.G(ctx).Info("WE'RE HERE WITH ENABLE KEYCHAIN IN THE CONFIG")
 		// connects to the backend CRI service (defaults to containerd socket)
 		criAddr := defaultImageServiceAddress
 		if cp := config.CRIKeychainConfig.ImageServicePath; cp != "" {
@@ -161,6 +162,9 @@ func main() {
 		f, criServer := cri.NewCRIKeychain(ctx, connectCRI)
 		runtime.RegisterImageServiceServer(rpc, criServer)
 		credsFuncs = append(credsFuncs, f)
+
+		log.G(ctx).Info("made it to the bottom of main keychain function")
+
 	}
 	fsOpts := []fs.Option{fs.WithMetricsLogLevel(logrus.InfoLevel)}
 	if config.IPFS {

@@ -17,6 +17,7 @@
 package plugincore
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -55,6 +56,8 @@ type Config struct {
 }
 
 func RegisterPlugin() {
+	log.G(context.TODO()).Info("init from somewhere to register pluging")
+
 	ctdplugin.Register(&ctdplugin.Registration{
 		Type:   ctdplugin.SnapshotPlugin,
 		ID:     "stargz",
@@ -92,6 +95,8 @@ func RegisterPlugin() {
 				if criAddr == "" {
 					return nil, errors.New("backend CRI service address is not specified")
 				}
+				log.G(ctx).Info("we're configuring keychain in plugin.go. criAddr: ", criAddr)
+
 				connectCRI := func() (runtime.ImageServiceClient, error) {
 					conn, err := newCRIConn(criAddr)
 					if err != nil {
@@ -103,6 +108,9 @@ func RegisterPlugin() {
 				// Create a gRPC server
 				rpc := grpc.NewServer()
 				runtime.RegisterImageServiceServer(rpc, criServer)
+
+				log.G(ctx).Info("image shoudl be registered")
+
 				// Prepare the directory for the socket
 				if err := os.MkdirAll(filepath.Dir(addr), 0700); err != nil {
 					return nil, fmt.Errorf("failed to create directory %q: %w", filepath.Dir(addr), err)
